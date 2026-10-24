@@ -1,20 +1,62 @@
 import dayjs from 'dayjs';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { CopyToClipboard } from 'react-copy-to-clipboard';
 import { LiaCheckSolid } from 'react-icons/lia';
 import { IoCopy } from 'react-icons/io5';
 import { FaExternalLinkAlt, FaRegCalendarAlt } from 'react-icons/fa'
-import { MdOutlineAdsClick } from 'react-icons/md'
+import { MdOutlineAdsClick, MdAnalytics } from 'react-icons/md'
 import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import { useStoreContext } from '../../contextApi/ContextApi';
+import api from '../../api/api';
 
 const ShortenItem = ({ originalUrl, shortUrl, clickCount, createdDate }) => {
 
+    const { token } = useStoreContext();
+    const navigate = useNavigate();
     const [isCopied, setIsCopied] = useState(false);
+    const [analyticToggle, setAnalyticToggle] = useState(false);
+    const [loader, setLoader] = useState(false);
+    const [selectedUrl, setSelectedUrl] = useState("");
+    const [analyticsData, setAnalyticsData] = useState([]);
 
-        const subDomain = import.meta.env.VITE_REACT_FRONT_END_URL.replace(
+    const subDomain = import.meta.env.VITE_REACT_FRONT_END_URL.replace(
         /^https?:\/\//,
         ""
-        );
+    );
+
+    const analyticsHandler = (shortUrl) => {
+        if (!analyticToggle) {
+            setSelectedUrl(shortUrl);
+        }
+        setAnalyticToggle(!analyticToggle);
+    }
+
+    const fetchMyShortUrl = async() => {
+        setLoader(true);
+        try {
+            const { data } = await api.get(`/api/urls/analytics/${selectedUrl}?startDate=2026-01-01T00:00:00&endDate=2026-12-31T23:59:59`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                    Authorization: "Bearer " + token,
+                },
+            });
+            setAnalyticsData(data);
+            setSelectedUrl("");
+        } catch (error) {
+            navigate("/error");
+            console.log(error);
+        } finally {
+            setLoader(false);
+        }
+    }
+
+    useEffect(() => {
+        if (selectedUrl) {
+            fetchMyShortUrl();
+        }
+    }, [selectedUrl]);
 
   return (
     <div className={`bg-slate-100 shadow-lg border border-dotted  border-slate-500 px-6 sm:py-1 py-3 rounded-md  transition-all duration-100 `}>
@@ -90,9 +132,27 @@ const ShortenItem = ({ originalUrl, shortUrl, clickCount, createdDate }) => {
                           )}
                       </div>
                   </CopyToClipboard>
+
+                  <div
+                      onClick={() => analyticsHandler(shortUrl)}
+                      className="flex cursor-pointer gap-1 items-center bg-rose-700 py-2 font-semibold shadow-md shadow-slate-500 px-6 rounded-md text-white "
+                  >
+                      <button>Analytics</button>
+                      <MdAnalytics className="text-md" />
+                  </div>
+
               </div>
 
         </div>
+
+          <React.Fragment>
+              <div className={`${
+                analyticToggle ? "flex" : "hidden"
+                  }  max-h-96 sm:mt-0 mt-5 min-h-96 relative  border-t-2 w-[100%] overflow-hidden `}>
+                  {loader ? (<div></div>) : (<div> </div>)}
+              </div>
+          </React.Fragment>
+
     </div>
   )
 }
