@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { useStoreContext } from '../../contextApi/ContextApi';
 import api from '../../api/api';
+import { InfinitySpin } from 'react-loader-spinner';
 
 const ShortenItem = ({ originalUrl, shortUrl, clickCount, createdDate }) => {
 
@@ -44,6 +45,7 @@ const ShortenItem = ({ originalUrl, shortUrl, clickCount, createdDate }) => {
             });
             setAnalyticsData(data);
             setSelectedUrl("");
+            console.log(data);
         } catch (error) {
             navigate("/error");
             console.log(error);
@@ -149,7 +151,21 @@ const ShortenItem = ({ originalUrl, shortUrl, clickCount, createdDate }) => {
               <div className={`${
                 analyticToggle ? "flex" : "hidden"
                   }  max-h-96 sm:mt-0 mt-5 min-h-96 relative  border-t-2 w-[100%] overflow-hidden `}>
-                  {loader ? (<div></div>) : (<div> </div>)}
+                  {loader ? (
+                      <div className="min-h-[calc(450px-140px)] flex justify-center items-center w-full">
+                          <div className="flex flex-col items-center gap-1">
+                              <InfinitySpin
+                                  width="200"
+                                  color="#306cce"
+                              />
+                              <p className='text-slate-700'>Please Wait...</p>
+                          </div>
+                      </div>
+                  ) : (
+                    <div> 
+
+                  </div>
+                )}
               </div>
           </React.Fragment>
 
