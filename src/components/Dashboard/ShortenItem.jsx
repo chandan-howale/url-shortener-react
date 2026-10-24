@@ -10,6 +10,8 @@ import { useNavigate } from 'react-router-dom';
 import { useStoreContext } from '../../contextApi/ContextApi';
 import api from '../../api/api';
 import { InfinitySpin } from 'react-loader-spinner';
+import Graph from './Graph'
+
 
 const ShortenItem = ({ originalUrl, shortUrl, clickCount, createdDate }) => {
 
@@ -162,10 +164,21 @@ const ShortenItem = ({ originalUrl, shortUrl, clickCount, createdDate }) => {
                           </div>
                       </div>
                   ) : (
-                    <div> 
+                      <>{analyticsData.length === 0 && (
+                          <div className="absolute flex flex-col  justify-center sm:items-center items-end  w-full left-0 top-0 bottom-0 right-0 m-auto">
+                              <h1 className=" text-slate-800 font-serif sm:text-2xl text-[15px] font-bold mb-1">
+                                  No Data For This Time Period
+                              </h1>
+                              <h3 className="sm:w-96 w-[90%] sm:ml-0 pl-6 text-center sm:text-lg text-[12px] text-slate-600 ">
+                                  Share your short link to view where your engagements are
+                                  coming from
+                              </h3>
+                          </div>
+                      )}
+                          <Graph graphData={analyticsData} />
+                      </>
 
-                  </div>
-                )}
+                  )}
               </div>
           </React.Fragment>
 
