@@ -11,6 +11,7 @@ import { useNavigate } from 'react-router-dom'
 const DashboardLayout = () => {
   // const refetch = false;
   const { token } = useStoreContext();
+  const navigate = useNavigate();
   const [shortenPopUp, setShortenPopUp] = useState(false);
 
   // console.log(useFetchTotalClicks(token, onError));
@@ -20,7 +21,7 @@ const DashboardLayout = () => {
   const {isPending: loader, data: totalClicks} = useFetchTotalClicks(token, onError)
 
   function onError() {
-    console.log("ERROR");
+    navigate("/error");
   }
 
   return (
